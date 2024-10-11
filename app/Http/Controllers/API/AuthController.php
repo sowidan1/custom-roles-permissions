@@ -7,9 +7,7 @@ use App\Http\Requests\API\LoginRequest;
 use App\Http\Requests\API\RegisterRequest;
 use App\Models\User;
 use App\Traits\ApiFormatResponse;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
@@ -20,7 +18,7 @@ class AuthController extends Controller
         $user = new User;
         $user->name = $validator['name'];
         $user->email = $validator['email'];
-        $user->role = $validator['role'];
+        $user->role_id = $validator['role_id'];
         $user->password = Hash::make($validator['password']);
         $user->save();
 
@@ -58,7 +56,9 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => JWTAuth::factory()->getTTL() * 60
+            'expires_in' => JWTAuth::factory()->getTTL() * 60,
+            'user' => auth('api')->user()->makeHidden('role'),
+            'permissions' => auth('api')->user()->permissions(),
         ]);
     }
 }
