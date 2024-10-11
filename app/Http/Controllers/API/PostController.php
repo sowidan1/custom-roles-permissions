@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\Gate;
 
 class PostController extends Controller
 {
+    public function index(){
+        gate::authorize('viewAny', Post::class);
+        $posts = Post::all();
+        return $posts;
+    }
+
     public function store (Request $request)
     {
         Gate::authorize('create_post');
